@@ -525,7 +525,7 @@ button:focus,
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   align-items: start;
 }
@@ -771,6 +771,13 @@ body[data-theme="dark"] .pickr .pcr-button {
   font-size: 0.98rem;
 }
 
+.dock-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .board-header {
   color: var(--muted);
 }
@@ -882,6 +889,53 @@ body[data-theme="dark"] .pickr .pcr-button {
   font-weight: 700;
 }
 
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 20, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+.modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  padding: 22px;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.modal-close {
+  min-height: 42px;
+}
+
+.chart-form {
+  display: grid;
+  gap: 12px;
+}
+
+.modal-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 .hidden {
   display: none;
 }
@@ -949,5 +1003,13 @@ body[data-theme="dark"] .pickr .pcr-button {
   .preview-footer {
     align-items: start;
     flex-direction: column;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 16px;
   }
 }
