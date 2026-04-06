@@ -32,6 +32,12 @@
     workspace: document.getElementById("workspace"),
     createForm: document.getElementById("createForm"),
     joinForm: document.getElementById("joinForm"),
+    authTabs: Array.from(document.querySelectorAll("[data-auth-tab]")),
+    authTabTriggers: Array.from(document.querySelectorAll("[data-auth-tab-trigger]")),
+    authPanels: {
+      create: document.getElementById("createPanel"),
+      join: document.getElementById("joinPanel")
+    },
     toolButtons: document.getElementById("toolButtons"),
     colorPalette: document.getElementById("colorPalette"),
     customColorPicker: document.getElementById("customColorPicker"),
@@ -54,6 +60,22 @@
 
   const ctx = appEls.canvas.getContext("2d");
   let pickr = null;
+
+  function switchAuthTab(tab) {
+    const nextTab = tab === "join" ? "join" : "create";
+
+    appEls.authTabs.forEach((button) => {
+      const active = button.dataset.authTab === nextTab;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+
+    Object.entries(appEls.authPanels).forEach(([panelName, panel]) => {
+      const active = panelName === nextTab;
+      panel.classList.toggle("hidden", !active);
+      panel.classList.toggle("active", active);
+    });
+  }
 
   function can(permission) {
     const role = state.currentMember?.role;
@@ -193,6 +215,10 @@
     if (pickr) {
       pickr.setColor(state.currentColor, true);
     }
+  }
+
+  function getBoardSurfaceColor() {
+    return state.theme === "dark" ? "#0f1620" : "#fffdf9";
   }
 
   function initCustomColorPicker() {
@@ -456,7 +482,7 @@
       case "arrow":
         return { kind: state.currentTool, start, end, color, width };
       case "eraser":
-        return { kind: "stroke", points: state.draftPoints, color: "#fffdf9", width: width * 2 };
+        return { kind: "stroke", points: state.draftPoints, color: getBoardSurfaceColor(), width: width * 2 };
       default:
         return { kind: "stroke", points: state.draftPoints, color, width };
     }
@@ -761,6 +787,7 @@
     if (!sessionId) {
       return;
     }
+    switchAuthTab("join");
     const sessionIdInput = appEls.joinForm.elements.namedItem("sessionId");
     const passwordInput = appEls.joinForm.elements.namedItem("password");
     if (sessionIdInput) {
@@ -775,6 +802,24 @@
   appEls.shapeAssistToggle.addEventListener("click", () => {
     state.shapeAssistEnabled = !state.shapeAssistEnabled;
     syncShapeAssistToggle();
+  });
+
+  appEls.authTabs.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchAuthTab(button.dataset.authTab);
+    });
+  });
+
+  appEls.authTabTriggers.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchAuthTab(button.dataset.authTabTrigger);
+      const targetForm = button.dataset.authTabTrigger === "join" ? appEls.joinForm : appEls.createForm;
+      targetForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const firstInput = targetForm.querySelector("input");
+      if (firstInput) {
+        firstInput.focus();
+      }
+    });
   });
 
   appEls.themeToggle.addEventListener("click", () => {
